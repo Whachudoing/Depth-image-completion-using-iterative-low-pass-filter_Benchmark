@@ -8,3 +8,5 @@ Steps for running codes:
   2. Run benchmark.m.
   3. Run benchmark_test.m
   4. The final result will be shown in the command line.
+
+The referenced advanced papers are mentioned in the main script.
