@@ -1,5 +1,5 @@
 # Depth-image-completion-using-iterative-low-pass-filter_Benchmark
-This page provides the detailed information of the benchmark result.
+This page provides the detailed information of  main code and benchmark result.
 
 ![image](https://github.com/Whachudoing/Depth-image-completion-using-iterative-low-pass-filter_Benchmark/assets/132032177/7d7ded91-3729-4ee1-a88b-1078b6e0db94)
 
@@ -14,5 +14,7 @@ Steps for running benchmark codes:
   2. Run benchmark.m.
   3. Run benchmark_test.m
   4. The final result will be shown in the command line.
+
+You can simply run the benchmark code to get the benchmark result.
 
 The referenced advanced papers are mentioned in the main script.
