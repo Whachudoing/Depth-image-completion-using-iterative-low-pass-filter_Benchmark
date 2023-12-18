@@ -1,7 +1,7 @@
 # Depth-image-completion-using-iterative-low-pass-filter_Benchmark
 This page provides the detailed information of  main code and benchmark result.
 
-![image](https://github.com/Whachudoing/Depth-image-completion-using-iterative-low-pass-filter_Benchmark/assets/132032177/7d7ded91-3729-4ee1-a88b-1078b6e0db94)
+
 
 Steps for running benchmark codes:
   1. Downloads the raw [NYU V2 Dataset](https://drive.google.com/file/d/1x9RrRvOtnaue3oMy8rPe2QelwJfMc_yV/view?usp=drive_link) and edge-detect result.
