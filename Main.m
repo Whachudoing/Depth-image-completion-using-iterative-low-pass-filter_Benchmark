@@ -203,7 +203,7 @@ colorfinal(1:sizep(1),1:sizep(2),2)=0;
 colorfinal(1:sizep(1),1:sizep(2),3)=0;
 cont=0;
 BWALLf=cell(1);
-% exist_rate_set=0.2627;
+
 exist_rate_set=0.52;
 raw_rate=[];
 sizecheck=size(depthimage);
