@@ -145,6 +145,7 @@ ptcleartable=pointCloud(pttp,'color',uint8(pttc));
 %///////////////////////////////////////////
 
  cform = makecform('srgb2lab');
+he=fg;
 lab_he = applycform(he,cform);
 ab = double(lab_he(:,:,2:3));
 nrows = size(ab,1);
