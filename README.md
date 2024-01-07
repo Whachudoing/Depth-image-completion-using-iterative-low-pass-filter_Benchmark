@@ -1,7 +1,8 @@
 # Depth-image-completion-using-iterative-low-pass-filter_Benchmark
 This page provides the detailed information of  main code and benchmark result.
 
-![result_231218](https://github.com/Whachudoing/Depth-image-completion-using-iterative-low-pass-filter_Benchmark/assets/132032177/4090b912-4af7-4680-8f36-fa03e34066aa)
+![Result_240107](https://github.com/Whachudoing/Depth-image-completion-using-iterative-low-pass-filter_Benchmark/assets/132032177/c77cb02f-58c5-49fd-a387-e64b364a0fb5)
+
 
 
 Steps for running benchmark codes:
