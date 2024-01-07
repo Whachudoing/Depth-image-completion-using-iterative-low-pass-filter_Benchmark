@@ -15,7 +15,8 @@ filepath = './result_test';
 midname = '/result_';
 
 filepath2 = './paper_results';
-
+% % CSPN
+p1 = '/CSPN_results/eval_result_3';
 % % NLSPN
 p2 = '/NLSPN_epoch0020';  
 
@@ -24,7 +25,7 @@ filepath3 = './HED_examples';
 % %  HED file name header
 midname2 = '/rgb_'; 
 % % Load image
-
+I_CSPN = (readall(imageDatastore([filepath2  p1 '/*.png'])));
 I_NLSPN = (readall(imageDatastore([filepath2  p2 '/*.png'])));
 
 
@@ -61,7 +62,7 @@ end
 % % downsize
 I_our_resize = {};
 I_NYU_VAL = {};
-
+I_CSPN_VAL = {}; 
 I_hed_resize = {};
 I_gt_resize = {};
 I_depth_resize = {};
@@ -84,18 +85,19 @@ for s = 1:length(I_our)
 
         % % normalize
 
-        I_our_resize{s} = I_temp/max(max(I_temp));
+
+         I_our_resize{s} = I_temp;
         I_NYU_VAL_tmp = double(I_NLSPN{s})/max(max(double(I_NLSPN{s})));
         I_NYU_VAL{s} = I_NYU_VAL_tmp;
-
-
+        I_CSPN_VAL_tmp = double(I_CSPN{s})/max(max(double(I_CSPN{s})));
+        I_CSPN_VAL{s} = I_CSPN_VAL_tmp;
         I_gt_resize{s} = I_gt_temp;
         I_depth_resize{s} = I_depth_temp;
       
     else
         I_our_resize{s} = [];
         I_NYU_VAL{s} = [];
-
+        I_CSPN_VAL{s} = [];
         I_hed_resize{s} = [];
         I_depth_resize{s} = [];
         I_gt_resize{s} = [];
@@ -110,27 +112,27 @@ end
 bw_region = {};
 RMSE_NYU = {};
 RMSE_our = {};
-
+RMSE_CSPN = {};
 RMSE_data = {};
 MAE_NYU = {};
 MAE_our = {};
-
+MAE_CSPN = {};
 MAE_data = {};
 iRMSE_NYU = {};
 iRMSE_our = {};
-
+iRMSE_CSPN = {};
 iRMSE_data = {};
 iMAE_NYU = {};
 iMAE_our = {};
-
+iMAE_CSPN = {};
 iMAE_data = {};
 Rel_NYU = {};
 Rel_our = {};
-
+Rel_CSPN = {};
 Rel_data = {};
 thre_NYU = {};
 thre_our = {};
-
+thre_CSPN = {};
 thre_data = {};
 m_count = {};
 idx_mix_gather = {};
@@ -138,7 +140,7 @@ I_gradient = {};
 parfor g = 1:length(I_our_resize)
 
     I_NYU_test = I_NYU_VAL{g};
-
+    I_CSPN_test = I_CSPN_VAL{g};
     I_our_test = I_our_resize{g};
     I_gt_test = I_gt_resize{g};
     I_input =  I_hed_resize{g};
@@ -165,56 +167,54 @@ parfor g = 1:length(I_our_resize)
     m_count_test = {};
     RMSE_NYU_test ={};
     RMSE_our_test = {};
-
+    RMSE_CSPN_test = {};
     RMSE_data_test = {};
 
     MAE_NYU_test = {};
-
+    MAE_CSPN_test = {};
     MAE_our_test = {};
     MAE_data_test = {};
 
     iRMSE_NYU_test ={};
     iRMSE_our_test = {};
-    
+    iRMSE_CSPN_test = {};
     iRMSE_data_test = {};    
 
     iMAE_NYU_test = {};
-
+    iMAE_CSPN_test = {};
     iMAE_our_test = {};
     iMAE_data_test = {};
 
     Rel_NYU_test = {};
     Rel_our_test = {};
-
+    Rel_CSPN_test = {};
     Rel_data_test = {};
 
     thre_NYU_test = {};
     thre_our_test = {};
-
+    thre_CSPN_test = {};
     thre_data_test = {};    
     idx_mix_tmp = {};
     I_gradient_test = {};
         for ss = 1:length(n_hs)
             I_NYU_test_input = I_NYU_test.*BWALL{ss};
-
+            I_CSPN_test_input = I_CSPN_test.*BWALL{ss};
             I_our_test_input = I_our_test .*BWALL{ss};
             
             I_gt_test_input = I_gt_test.*BWALL{ss};
             I_depth_test_input = I_depth_input.*BWALL{ss};
             
-            I_NYU_test_input = I_NYU_test_input/max(max(I_NYU_test_input));
 
-            I_our_test_input = I_our_test_input/max(max(I_our_test_input));
-            I_gt_test_input = I_gt_test_input/max(max(I_gt_test_input));
             I_gradient_test {ss} = gradient(gradient(I_gt_test_input.*BWALL{ss}));
 
 % %  available data
             idx_NYU  = find(I_NYU_test_input~=0);
             idx_our = find(I_our_test_input~=0);
-
-            if length(idx_NYU)<length(idx_our) 
+            idx_CSPN = find(I_CSPN_test_input~=0);
+            if length(idx_NYU)<length(idx_our) && length(idx_NYU)<length(idx_CSPN)
                 idx_mix = idx_NYU;
-
+            elseif length(idx_CSPN)<length(idx_NYU) && length(idx_CSPN)<length(idx_our)
+                idx_mix = idx_CSPN;
             else
                 idx_mix = idx_our;
             end
@@ -227,31 +227,31 @@ parfor g = 1:length(I_our_resize)
             m_count_test{ss} = length(m);
             RMSE_NYU_test{ss} =   ( sqrt(sum(sum(((I_NYU_test_input( (idx_mix))-I_gt_test_input( (idx_mix))).^2)))/ava_count));
             RMSE_our_test{ss} =   ( sqrt(sum(sum(((I_our_test_input( (idx_mix))-I_gt_test_input( (idx_mix))).^2)))/ava_count));
-           
+            RMSE_CSPN_test{ss} =  ( sqrt(sum(sum(((I_CSPN_test_input( (idx_mix))-I_gt_test_input( (idx_mix))).^2)))/ava_count));
             RMSE_data_test{ss} =  ( sqrt(sum(sum(((I_depth_test_input( (idx_mix))-I_gt_test_input( (idx_mix))).^2)))/ava_count));
            
            
     % %     MAE
             MAE_NYU_test{ss} =   ( sum(sum(abs(I_NYU_test_input((idx_mix))-I_gt_test_input( (idx_mix)))))/ava_count) ;
             MAE_our_test{ss} =   ( sum(sum(abs(I_our_test_input( (idx_mix))-I_gt_test_input( (idx_mix)))))/ava_count);
-         
+            MAE_CSPN_test{ss} =  ( sum(sum(abs(I_CSPN_test_input( (idx_mix))-I_gt_test_input( (idx_mix)))))/ava_count);
             MAE_data_test{ss} =  ( sum(sum(abs(I_depth_test_input( (idx_mix))-I_gt_test_input( (idx_mix)))))/ava_count);
 % % irmse
 
             iRMSE_NYU_test{ss} =    sqrt(1/ava_count*sum(sum((1./I_NYU_test_input( (idx_mix))-1./I_gt_test_input( (idx_mix))).^2)));
             iRMSE_our_test{ss} =    sqrt(1/ava_count*sum(sum((1./I_our_test_input( (idx_mix))-1./I_gt_test_input( (idx_mix))).^2)));
-       
+            iRMSE_CSPN_test{ss} =   sqrt(1/ava_count*sum(sum((1./I_CSPN_test_input( (idx_mix))-1./I_gt_test_input( (idx_mix))).^2)));
             iRMSE_data_test{ss} =   sqrt(1/ava_count*sum(sum((1./I_depth_test_input( (idx_mix))-1./I_gt_test_input( (idx_mix))).^2)));
 % % iMAE
             iMAE_NYU_test{ss} =  1/ava_count*(sum(abs(1./I_NYU_test_input( (idx_mix))-1./I_gt_test_input( (idx_mix)))));
             iMAE_our_test{ss} =  1/ava_count*(sum(abs(1./I_our_test_input( (idx_mix))-1./I_gt_test_input( (idx_mix)))));
-       
+            iMAE_CSPN_test{ss} =  1/ava_count*(sum(abs(1./I_CSPN_test_input( (idx_mix))-1./I_gt_test_input( (idx_mix)))));
             iMAE_data_test{ss} =  1/ava_count*(sum(abs(1./I_depth_test_input( (idx_mix))-1./I_gt_test_input( (idx_mix)))));
 
     % %     Rel
             Rel_NYU_test{ss} = sum(abs(I_NYU_test_input( (idx_mix))-I_gt_test_input( (idx_mix)))./I_gt_test_input( (idx_mix)))/ava_count;
             Rel_our_test{ss} =  sum(abs(I_our_test_input( (idx_mix))-I_gt_test_input( (idx_mix)))./I_gt_test_input( (idx_mix)))/ava_count;
-     
+            Rel_CSPN_test{ss} = sum(abs(I_CSPN_test_input( (idx_mix))-I_gt_test_input( (idx_mix)))./I_gt_test_input( (idx_mix)))/ava_count;
             Rel_data_test{ss} =  sum(abs(I_depth_test_input( (idx_mix))-I_gt_test_input( (idx_mix)))./I_gt_test_input( (idx_mix)))/ava_count;
 
 % %  threshold accuracy
@@ -263,8 +263,9 @@ parfor g = 1:length(I_our_resize)
                 thre_our_test{ss} =  [sum(thre_our_testp < 1.25)/length(thre_our_testp) sum(thre_our_testp < 1.25^2)/length(thre_our_testp)...
                     sum(thre_our_testp < 1.25^3)/length(thre_our_testp)];
                
-
-               
+                thre_CSPN_testp = max([I_CSPN_test_input( (idx_mix))./ I_gt_test_input( (idx_mix)) I_gt_test_input( (idx_mix))./I_CSPN_test_input( (idx_mix))]')';
+                thre_CSPN_test{ss} = [sum(thre_CSPN_testp < 1.25)/length(thre_CSPN_testp) sum(thre_CSPN_testp < 1.25^2)/length(thre_CSPN_testp)...
+                    sum(thre_CSPN_testp < 1.25^3)/length(thre_CSPN_testp)];
                 thre_data_testp = max([I_depth_test_input( (idx_mix))./ I_gt_test_input( (idx_mix)) I_gt_test_input( (idx_mix))./I_depth_test_input( (idx_mix))]')';
                 thre_data_test{ss} = [sum(thre_data_testp < 1.25)/length(thre_data_testp) sum(thre_data_testp < 1.25^2)/length(thre_data_testp)...
                     sum(thre_data_testp < 1.25^3)/length(thre_data_testp)];
@@ -274,68 +275,68 @@ parfor g = 1:length(I_our_resize)
     
     RMSE_NYU{g} = RMSE_NYU_test;
     RMSE_our{g} = RMSE_our_test;
-
+    RMSE_CSPN{g} = RMSE_CSPN_test;
     RMSE_data{g} = RMSE_data_test;
 
     m_count{g} = m_count_test;
 
     MAE_NYU{g} = MAE_NYU_test;
     MAE_our{g} = MAE_our_test;
-
+    MAE_CSPN{g} = MAE_CSPN_test;
     MAE_data{g} = MAE_data_test;
 
     iRMSE_NYU{g} = iRMSE_NYU_test;
     iRMSE_our{g} = iRMSE_our_test;
-
+    iRMSE_CSPN{g} = iRMSE_CSPN_test;
     iRMSE_data{g} = iRMSE_data_test;
         
     iMAE_NYU{g} = iMAE_NYU_test;
     iMAE_our{g} = iMAE_our_test;
-
+    iMAE_CSPN{g} = iMAE_CSPN_test;
     iMAE_data{g} = iMAE_data_test;
 
     Rel_NYU{g} = Rel_NYU_test;
     Rel_our{g} = Rel_our_test;
-
+    Rel_CSPN{g} = Rel_CSPN_test;
     Rel_data{g} = Rel_data_test;
     
     thre_NYU{g} = thre_NYU_test;
     thre_our{g} = thre_our_test;
-
+    thre_CSPN{g} = thre_CSPN_test;
     thre_data{g} = thre_data_test;
 
     idx_mix_gather{g} = idx_mix_tmp;
     else
         RMSE_NYU{g} ={};
         RMSE_our{g} = {};
-
+        RMSE_CSPN{g} = {};
         RMSE_data{g} = {};
 
         m_count{g} = {};
 
         MAE_NYU{g} = {};
         MAE_our{g} = {};
- 
+        MAE_CSPN{g} = {};    
         MAE_data{g} = {};
 
         iRMSE_NYU{g} = {};
         iRMSE_our{g} = {};
- 
+        iRMSE_CSPN{g} = {};    
         iRMSE_data{g} = {}; 
 
         iMAE_NYU{g} = {};
         iMAE_our{g} = {};
-
+        iMAE_CSPN{g} = {};
         iMAE_data{g} = {};
 
         Rel_NYU{g} = {};
         Rel_our{g} = {};
-
+        Rel_CSPN{g} = {};
         Rel_data{g} = {};
         
         thre_NYU{g} = {};
         thre_our{g} = {};
-
+        thre_CSPN{g} = {};
         thre_data{g} = {};
         idx_mix_gather{g} = {};
 
