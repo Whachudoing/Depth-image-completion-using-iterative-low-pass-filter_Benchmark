@@ -87,9 +87,9 @@ for s = 1:length(I_our)
 
 
          I_our_resize{s} = I_temp;
-        I_NYU_VAL_tmp = double(I_NLSPN{s})/max(max(double(I_NLSPN{s})));
+        I_NYU_VAL_tmp = double(I_NLSPN{s});
         I_NYU_VAL{s} = I_NYU_VAL_tmp;
-        I_CSPN_VAL_tmp = double(I_CSPN{s})/max(max(double(I_CSPN{s})));
+        I_CSPN_VAL_tmp = double(I_CSPN{s});
         I_CSPN_VAL{s} = I_CSPN_VAL_tmp;
         I_gt_resize{s} = I_gt_temp;
         I_depth_resize{s} = I_depth_temp;
